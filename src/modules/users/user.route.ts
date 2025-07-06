@@ -23,4 +23,3 @@ router.put(
 router.delete('/:id', validateParams(ParamsIdSchema), userController.delete);
 
 export default router;
-//
