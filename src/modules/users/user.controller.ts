@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { UserService } from './user.service';
 import { injectable, inject } from 'tsyringe';
+import { CreateUserDto, UpdateUserDto } from './user.dto';
 
 @injectable()
 export class UserController {
@@ -18,12 +19,14 @@ export class UserController {
   };
 
   create = async (req: Request, res: Response) => {
-    const user = await this.userService.create(req.body);
+    const dto: CreateUserDto = req.body;
+    const user = await this.userService.create(dto);
     res.status(201).json(user);
   };
 
   update = async (req: Request, res: Response) => {
-    const user = await this.userService.update(Number(req.params.id), req.body);
+    const dto: UpdateUserDto = req.body;
+    const user = await this.userService.update(Number(req.params.id), dto);
     res.json(user);
   };
 
