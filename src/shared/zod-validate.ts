@@ -17,3 +17,15 @@ export const zodValidate =
     req.body = result.data;
     next();
   };
+
+export const validateParams = (schema: ZodSchema<any>) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const result = schema.safeParse(req.params);
+    if (!result.success) {
+      res.status(400).json({ errors: result.error.errors });
+      return;
+    }
+    req.params = result.data;
+    next();
+  };
+};
