@@ -1,106 +1,187 @@
-# 🚀 Advanced REST API Boilerplate
+# 🚀 Ultimate Node.js API Boilerplate
 
-A high-performance REST API built with:
+An advanced, scalable REST API built with modern technologies and real-world caching strategy using Redis versioning.
 
-- 🧠 Node.js **v20.x**
-- ⚡ Express **v5.1.0**
-- 🟦 TypeScript **v5.8.3**
-- 🗄 PostgreSQL **v13**
-- 🔁 Prisma ORM **v6.11.11**
-- 🧠 Redis for **smart cache versioning**
+---
+
+## 📦 Tech Stack
+
+| Tech           | Version     | Description          |                |
+| -------------- | ----------- | -------------------- | -------------- |
+|                | **Node.js** | 20.x                 | Server runtime |
+| **Express**    | 5.1.0       | Web framework        |                |
+| **TypeScript** | 5.8.3       | Typed JavaScript     |                |
+| **PostgreSQL** | 13.x        | Relational Database  |                |
+| **Prisma**     | 6.11.11     | Type-safe ORM        |                |
+| **Redis**      | latest      | Caching & Versioning |                |
+
+---
+
+## 🧠 Redis Versioned Caching Strategy
+
+To avoid stale cache while keeping blazing fast responses:
+
+- `users:version` → global version counter
+- `user:{id}:version` → per-record version
+- Cached keys:
+  - `users-v{version}`
+  - `user:{id}-v{version}`
+
+### ✅ Auto-invalidation by version increment:
+
+| Action      | Redis Operation                    |
+| ----------- | ---------------------------------- |
+| Create User | `INCR users:version`               |
+| Update User | `INCR users:version` + `user:{id}` |
+| Delete User | `INCR users:version` + `user:{id}` |
+
+This way, old cache becomes unreachable instead of being manually deleted.
 
 ---
 
 ## 📁 Project Structure
 
+```
 src/
-│
 ├── modules/
-│ └── user/
-│ ├── user.controller.ts
-│ ├── user.service.ts
-│ ├── user.repository.ts
-│ ├── user.entity.ts
-│ └── user.dto.ts
+│   └── user/
+│       ├── user.controller.ts
+│       ├── user.service.ts
+│       ├── user.repository.ts
+│       ├── user.entity.ts
+│       └── user.dto.ts
 │
 ├── config/
-│ ├── database.ts
-│ └── redis.ts
+│   ├── redis.ts
+│   └── database.ts
 │
 ├── app.ts
 └── main.ts
-
+```
 
 ---
 
-## ⚙️ Setup & Installation
+## ⚙️ Getting Started
 
 ```bash
-# Clone repository
-git clone https://github.com/programmingwithnavilla/nodejs-redis-versioning.git
-cd nodejs-redis-versioning
+# Clone the repo
+git clone https://github.com/your-org/your-repo.git
+cd your-repo
 
 # Install dependencies
 npm install
 
-# Generate Prisma client
+# Setup Prisma
 npx prisma generate
-
-# Run migrations
 npx prisma migrate dev --name init
 
-# Create .env file
+# Create env file
 cp .env.example .env
 
-# Start development server
+# Start server
 npm run dev
+```
 
 ---
-# 🧪 API Testing via curl
 
-## ➕ Create user
+## 🥪 API Testing (with curl)
 
+### ➕ Create a new user
+
+```bash
 curl -X POST http://localhost:3000/users \
   -H "Content-Type: application/json" \
-  -d '{"name":"Alice","email":"alice@example.com"}'
+  -d '{"name":"John Doe","email":"john@example.com"}'
+```
 
-## 📥 Get all users
+### 📅 Get all users
+
+```bash
 curl http://localhost:3000/users
+```
 
-## 🛠 Update user
+### 🔍 Get user by ID
+
+```bash
+curl http://localhost:3000/users/1
+```
+
+### ✏️ Update a user
+
+```bash
 curl -X PUT http://localhost:3000/users/1 \
   -H "Content-Type: application/json" \
-  -d '{"name":"Alice Updated"}'
+  -d '{"name":"John Updated"}'
+```
 
-## ❌ Delete user
+### ❌ Delete a user
+
+```bash
 curl -X DELETE http://localhost:3000/users/1
+```
 
-🧠 Redis Caching & Versioning
+---
 
- Concept:
-To ensure data freshness while caching:
+## 📊 Redis Key Examples
 
-Global versioning for list cache:
-users:version → 4
-Cached as: users-v4
+```text
+users:version            → 5
+users-v5                 → [user1, user2, ...]
+user:3:version           → 7
+user:3-v7                → { id: 3, name: ... }
+```
 
-Per-user versioning for individual cache:
-user:1:version → 3
-Cached as: user:1-v3
+---
 
-How it works:
-When GET /users is called:
+## 🔒 Environment Variables
 
-Checks users:version
+`.env` should contain:
 
-If cache users-v{version} exists → return
+```
+DATABASE_URL=postgresql://user:password@localhost:5432/db
+REDIS_URL=redis://localhost:6379
+PORT=3000
+```
 
-Else fetch from DB → set cache for that version
+---
 
-When POST/PUT/DELETE is called:
+## ✅ Scripts
 
-Increments users:version (and user:{id}:version if applicable)
+```bash
+npm run dev           # Start dev server
+npm run build         # Build TS to JS
+npm run start         # Start production
+```
 
-Ensures subsequent reads fetch fresh data
+---
 
-No need to manually invalidate old keys — versioning handles it automatically.
+## 🧹 Linting & Formatting
+
+```bash
+npm run lint
+npm run format
+```
+
+---
+
+## 📬 Contribution Guide
+
+1. Fork this repo
+2. Create your feature branch: `git checkout -b feat/amazing-feature`
+3. Commit your changes: `git commit -m 'feat: add amazing feature'`
+4. Push to the branch: `git push origin feat/amazing-feature`
+5. Create a Pull Request
+
+---
+
+## 📄 License
+
+Licensed under the MIT License.\
+Feel free to use, modify, and distribute 🚀
+
+---
+
+## 👨‍💼 Author
+
+Made with ❤️ by [Your Name](https://github.com/your-username)
+
